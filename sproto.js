@@ -464,6 +464,7 @@
                     var t = sproto.proto[mid].tag;
                     if (t == proto) {
                         p = sproto.proto[mid];
+                        break;
                     }
                     if (proto > t) {
                         begin = mid + 1;
@@ -532,7 +533,7 @@
                     }
                     args.index = 0;
                     if (value < 0) {
-                        if (f.type & SPROTO_TARRAY != 0) {
+                        if (f.type == SPROTO_TARRAY) {
                             if (decode_array(cb, args, currentdata) != 0) {
                                 return -1;
                             }
@@ -615,7 +616,7 @@
                     alert("invalid type");
                 }
                 if (args.index > 0) {
-                    self.result[args.tagname][args.index] = value;
+                    self.result[args.tagname][args.index - 1] = value;
                 } else {
                     self.result[args.tagname] = value;
                 }
@@ -767,7 +768,7 @@
                     } else {
                         args.subtype = null;
                     }
-                    if (type & SPROTO_TARRAY) {
+                    if (type == SPROTO_TARRAY) {
                         args.type = type & ~SPROTO_TARRAY;
                         sz = encode_array(cb, args, data_idx);
                     } else {
@@ -854,7 +855,7 @@
                     if (args.tagname != self.array_tag) {
                         self.array_tag = args.tagname;
                     }
-                    if (self.indata[args.tagname][args.index] == null) {
+                    if (self.indata[args.tagname][args.index - 1] == null) {
                         return 0;
                     }
                 }
@@ -864,7 +865,7 @@
                     if (args.index == 0) {
                         args.value = self.indata[args.tagname];
                     } else {
-                        args.value = self.indata[args.tagname][args.index];
+                        args.value = self.indata[args.tagname][args.index - 1];
                     }
                     return 4;
                 case SPROTO_TSTRING:
@@ -872,7 +873,7 @@
                     if (args.index == 0) {
                         str = self.indata[args.tagname];
                     } else {
-                        str = self.indata[args.tagname][args.index];
+                        str = self.indata[args.tagname][args.index - 1];
                     }
                     for (var i = 0; i < str.length; i++) {
                         enbuffer[args.value + i] = str.charCodeAt(i);
@@ -886,7 +887,7 @@
                     if (args.index == 0) {
                         sub.indata = self.indata[args.tagname];
                     } else {
-                        sub.indata = self.indata[args.tagname][args.index];
+                        sub.indata = self.indata[args.tagname][args.index - 1];
                     }
                     r = sproto_encode(args.subtype, args.value, encode, sub);
                     return r;
@@ -1181,11 +1182,11 @@
                     if (!header.session) {
                         alert("session not found");
                     }
-                    session = header.session;                
+                    var session = header.session;                
                     if (!sproto.__session[session]) {
                         alert("session not found");
                     }
-                    response = sproto.__session[session];
+                    var response = sproto.__session[session];
                     sproto.__session[session] = null;
                     if (response == true) {
                         return rsp_cb(session, null);
