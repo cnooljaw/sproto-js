@@ -533,7 +533,7 @@
                     }
                     args.index = 0;
                     if (value < 0) {
-                        if (f.type == SPROTO_TARRAY) {
+                        if ((f.type == SPROTO_TARRAY) || (f.type & SPROTO_TARRAY != 0)) {
                             if (decode_array(cb, args, currentdata) != 0) {
                                 return -1;
                             }
@@ -768,7 +768,7 @@
                     } else {
                         args.subtype = null;
                     }
-                    if (type == SPROTO_TARRAY) {
+                    if ((type == SPROTO_TARRAY) || (type & SPROTO_TARRAY != 0)) {
                         args.type = type & ~SPROTO_TARRAY;
                         sz = encode_array(cb, args, data_idx);
                     } else {
