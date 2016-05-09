@@ -951,6 +951,40 @@
                     return ud.result;
                 }
             }
+            sproto.pack2 = function(inbuf) {
+                var srcsz = inbuf.sz;
+                var ff_srcstart = 0;
+                var ff_desstart = 0;
+                var ff_n = 0;
+                var src = inbuf.buf;
+                var offset = 0;
+                var tmp = new Array();
+                var ff_src = new Array();
+                for(var i = 0; i < srcsz; i += 8) {
+                    offset = i;
+                    var padding = i + 8 - srcsz;
+                    if (padding > 0) {
+                        for(var j = 0; j < 8 - padding; j++){
+                            tmp[j] = src[i + j];
+                        }
+                        
+                        for(var j = 0; j < padding; j++){
+                            tmp[7 - j] = 0;
+                        }
+                        
+                        src = tmp;
+                        offset = 0;
+                    }
+                    
+                    var n = pack_seg(src, offset, ff_n);
+                    if (n == 10) {
+                        ff_src = src;
+                        ff_srcstart = offset;
+                        ff_desstart = 0;
+                    }
+                }
+                
+            }
             sproto.pack = function(inbuf) {
                 var tmp = new Array();
                 var i, ff_srcstart, ff_desstart;
@@ -974,6 +1008,10 @@
                     }
                     for (i = 0; i < align8_n - nn; i++) {
                         buffer[des_idx + nn + 2 + i] = 0;
+                    }
+                    
+                    if (src.length == nn && nn % 8 == 0) {
+                        buffer.length = buffer.length - 1;
                     }
                 }
                 function pack_seg(s_idx, b_idx, sz, nn) {
